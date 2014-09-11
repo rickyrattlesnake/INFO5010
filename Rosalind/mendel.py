@@ -25,15 +25,24 @@ def probPhenotypeExp(g1, g2):
             return 0
 
 def prob2Pop(homoDNum, heteroNum, homoRNum):
-    total = homoDNum + heteroNum + homoRNum
-    total2 = total * (total - 1)
-    homoD_homoD = homoDNum * (homoDNum - 1) / total2
-    homoD_hetero = homoDNum * hetero / total2
-    homoD_homoR = homoDNum * homoRNum / total2
-    homoR_hetero = homoRNum * heteroNum / total2
-    homoR_homoR = homoR * (homoR - 1) / total2
-    hetero_hetero = hetero * (hetero - 1) / total2
-    p = [ i * j / t2 if n != m else i * (j-1) / t2 for n,i in enumerate(args) for m,j in enumerate(args)]
-    z2pMap = lambda x, y : (x - 1) * 3 + (y - 1)
-    e = [z2pMap(x, y) for x in Zygosity for y in Zygosity]
-    print(e)
+    args = (homoDNum, heteroNum, homoRNum)
+    t2 = sum(args) * (sum(args) - 1)
+    probMatrix = [[],[],[]]
+    for z in range(3):
+        if z == 0:
+            p = homoDNum
+        elif z == 1:
+            p = heteroNum
+        else:
+            p = homoRNum
+        probMatrix[z] = [p * i / t2 if n != z else p * (i-1) / t2 for n,i in enumerate(args)]
+    print(probMatrix)
+
+    totalDomChance = 0
+    for i,z in enumerate(Zygosity):
+        for j,z2 in enumerate(Zygosity):
+            totalDomChance += probMatrix[i][j] * probPhenotypeExp(z,z2)
+    return totalDomChance
+
+print(prob2Pop(27,24,18))
+
